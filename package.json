@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npx serve public",
+    "start:web": "npx serve public",
+    "start:socket": "node socket",
+    "start": "concurrently 'npm:start:*'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,10 +21,12 @@
   },
   "homepage": "https://github.com/corupta/wander-test-dashboard#readme",
   "dependencies": {
-    "serve": "^13.0.2"
+    "socket.io": "^4.4.0"
   },
   "devDependencies": {
     "@types/chart.js": "^2.9.34",
+    "concurrently": "^6.4.0",
+    "serve": "^13.0.2",
     "socket.io-client": "^4.4.0"
   }
 }
