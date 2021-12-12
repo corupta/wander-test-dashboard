@@ -19,93 +19,61 @@ window.nextTraces = {}
 const resetNextTraces = () => {
   ['acceleration_int2', 'rotation_int2', 'rotationRate_int2']
     .forEach((k) => {
-      nextTraces[k] = [];
+      nextTraces[k] = new ScatterGL.Dataset([[0,0,0]]);
+      nextTraces[k].points = [];
     })
 }
+window.resetNextTraces = resetNextTraces;
 resetNextTraces();
 
 window.saveNewData = (rawData) => {
-  window.nextTraces.acceleration_int2.push({
-    x: rawData.acceleration.x.int2,
-    y: rawData.acceleration.y.int2,
-    z: rawData.acceleration.z.int2,
-  });
-  window.nextTraces.rotation_int2.push({
-    x: rawData.rotation.alpha.int2,
-    y: rawData.rotation.beta.int2,
-    z: rawData.rotation.gamma.int2,
-  });
-  window.nextTraces.rotationRate_int2.push({
-    x: rawData.rotationRate.alpha.int2,
-    y: rawData.rotationRate.beta.int2,
-    z: rawData.rotationRate.gamma.int2,
-  })
+  window.nextTraces.acceleration_int2.points.push([
+    rawData.acceleration.x.int2,
+    rawData.acceleration.y.int2,
+    rawData.acceleration.z.int2,
+  ]);
+  window.nextTraces.rotation_int2.points.push([
+    rawData.rotation.alpha.int2,
+    rawData.rotation.beta.int2,
+    rawData.rotation.gamma.int2,
+  ]);
+  window.nextTraces.rotationRate_int2.points.push([
+    rawData.rotationRate.alpha.int2,
+    rawData.rotationRate.beta.int2,
+    rawData.rotationRate.gamma.int2,
+  ]);
+}
+
+const plotByKey = {
+
 }
 
 window.createPlot = () => {
   const currTraces = {...window.nextTraces};
-  resetNextTraces();
+  // resetNextTraces();
   Object.entries(currTraces)
     .forEach(([k, v], i) => {
-      const trace = {
-        x: v.map((p) => p.x),
-        y: v.map((p) => p.y),
-        z: v.map((p) => p.z),
-        mode: 'markers',
-        marker: {
-          size: 2,
-          color: colors[i],
-          symbol: 'circle',
-          line: {
-            color: colors[i],
-            width: 1,
-            opacity: 0.8
-          },
-          opacity: 0.8
-        },
-        type: 'scatter3d'
-      }
+      const dataset = v;
       const div = document.createElement('div');
       div.setAttribute('id', k);
       document.getElementById('plots').appendChild(div)
-      const layout = {
-        autosize: true,
-        l: 0, r: 0, b: 0, t: 0, pad: 0,
-        showlegend: false,
-        margin:{l:0,r:0,b:0,t:0},
-        xaxis: {
-          uirevision: 'time',
-        },
-        yaxis: {
-          uirevision: 'time',
-        },
-        zaxis: {
-          uirevision: 'time',
-        },
-
-      }
-      Plotly.newPlot(k, [trace], layout);
+      const scatterGL = new ScatterGL(div, {
+        rotateOnStart: false
+      });
+      plotByKey[k] = scatterGL;
+      scatterGL.render(dataset);
     });
 }
 
 window.updatePlot = () => {
   const currTraces = {...window.nextTraces};
-  resetNextTraces();
-  Object.entries(currTraces).forEach(([traceKey, tr]) => {
-    const patchData = ['x','y','z'].reduce((acc, k) => ({
-      ...acc,
-      [k]: [tr.map((x) => x[k])]
-    }), {});
-    const patchIndexes = [0]
-    // Object.values(currTraces).map((tr, i) => i);
-    Plotly.extendTraces(traceKey, patchData, patchIndexes);
-  })
-  /*const patchData = ['x','y','z'].reduce((acc, k) => ({
-    ...acc,
-    [k]: Object.values(currTraces).map((tr) => tr.map((x) => x[k]))
-  }), {});
-
-  Plotly.extendTraces('wanderPlot', patchData, patchIndexes);*/
+  // resetNextTraces();
+  Object.entries(currTraces)
+    .forEach(([k, v], i) => {
+      const dataset = v;
+      const scatterGL = plotByKey[k];
+      scatterGL.updateDataset(dataset);
+    });
 }
 
 
@@ -144,7 +112,7 @@ window.reloadChart = () => {
     window.createPlot()
     plotReady = true;
   }
-  setTimeout(window.reloadChart, 1000);
+  setTimeout(window.reloadChart, 100);
 }
 window.handleNewData = (data, timestamp = Date.now()) => {
   window.saveNewData(data);
@@ -154,7 +122,7 @@ const _initSocketIO = () => {
   const socket = io("http://192.168.0.21:8080");
   localStorage.debug = 'socket.io-client:socket';
   socket.on('data', window.handleNewData);
-  setTimeout(window.reloadChart, 1000);
+  setTimeout(window.reloadChart, 100);
 }
 
 _initSocketIO();
