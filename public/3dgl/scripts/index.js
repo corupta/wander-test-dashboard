@@ -15,7 +15,7 @@ const colors = ['#891cc7', '#41a87d', '#285ee5'];
 
 const MAX_DATA_SET_LENGTH = 2000;
 
-const CM = 1;
+const CM = 0.1;
 const corners = [[CM,CM],[-CM,-CM]];
 const corners3 = [[CM,CM,CM],[-CM,-CM,-CM]];
 

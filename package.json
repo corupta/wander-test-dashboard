@@ -7,6 +7,7 @@
     "start:web": "npx serve public",
     "start:socket": "node socket",
     "start": "concurrently 'npm:start:*'",
+    "sim": "node similarity",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,6 +22,7 @@
   },
   "homepage": "https://github.com/corupta/wander-test-dashboard#readme",
   "dependencies": {
+    "jimp": "^0.16.1",
     "socket.io": "^4.4.0"
   },
   "devDependencies": {
