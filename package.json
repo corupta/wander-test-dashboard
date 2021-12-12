@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "npx serve public",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,5 +20,9 @@
   "homepage": "https://github.com/corupta/wander-test-dashboard#readme",
   "dependencies": {
     "serve": "^13.0.2"
+  },
+  "devDependencies": {
+    "@types/chart.js": "^2.9.34",
+    "socket.io-client": "^4.4.0"
   }
 }

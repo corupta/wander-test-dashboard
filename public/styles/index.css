@@ -1,0 +1,11 @@
+#charts {
+    display: grid;
+    width: 100%;
+    grid-gap: 50px 50px;
+    grid-template-columns: 20% 20% 20% 20% 20%;
+}
+
+#charts canvas {
+    width: 20% !important;
+    height: 200px !important;
+}
