@@ -1,0 +1,8 @@
+#plots {
+    width: 100%;
+    display: flex;
+}
+
+#plots > .js-plotly-plot {
+    width: 33%;
+}
