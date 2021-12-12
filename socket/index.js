@@ -5,6 +5,7 @@ const io = new Server({ cors: true });
 io.on("connection", (socket) => {
   console.log('new socket connection');
   socket.on("data", (data, timestamp = Date.now()) => {
+    console.log('ts', timestamp);
     socket.broadcast.emit("data", data, timestamp);
   });
   socket.on('disconnect', () => {
