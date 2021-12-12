@@ -15,31 +15,52 @@ const colors = ['#891cc7', '#41a87d', '#285ee5'];
 
 const MAX_DATA_SET_LENGTH = 2000;
 
+const CM = 1;
+const corners = [[CM,CM],[-CM,-CM]];
+const corners3 = [[CM,CM,CM],[-CM,-CM,-CM]];
+
 window.nextTraces = {}
 const resetNextTraces = () => {
-  ['acceleration_int2', 'rotation_int2', 'rotationRate_int2']
+  /*['acceleration_int2', 'rotation_int2', 'rotationRate_int2']
     .forEach((k) => {
-      nextTraces[k] = new ScatterGL.Dataset([[0,0,0]]);
-      nextTraces[k].points = [];
+      nextTraces[k] = new ScatterGL.Dataset([...corners3]);
+      // nextTraces[k].points = [];
+    });*/
+  ['acceleration_2d', /*'rotation_2d',*/ 'rotationRate_2d']
+    .forEach((k) => {
+      nextTraces[k] = new ScatterGL.Dataset([...corners]);
+      // nextTraces[k].points = [];
     })
 }
 window.resetNextTraces = resetNextTraces;
 resetNextTraces();
 
 window.saveNewData = (rawData) => {
-  window.nextTraces.acceleration_int2.points.push([
+  /*window.nextTraces.acceleration_int2.points.push([
     rawData.acceleration.x.int2,
     rawData.acceleration.y.int2,
     rawData.acceleration.z.int2,
+  ]);*/
+  window.nextTraces.acceleration_2d.points.push([
+    rawData.acceleration.y.int2,
+    rawData.acceleration.z.int2,
   ]);
-  window.nextTraces.rotation_int2.points.push([
+  /*window.nextTraces.rotation_int2.points.push([
     rawData.rotation.alpha.int2,
     rawData.rotation.beta.int2,
     rawData.rotation.gamma.int2,
   ]);
-  window.nextTraces.rotationRate_int2.points.push([
+  window.nextTraces.rotation_2d.points.push([
+    rawData.rotation.alpha.int2,
+    rawData.rotation.gamma.int2,
+  ]);*/
+  /*window.nextTraces.rotationRate_int2.points.push([
     rawData.rotationRate.alpha.int2,
     rawData.rotationRate.beta.int2,
+    rawData.rotationRate.gamma.int2,
+  ]);*/
+  window.nextTraces.rotationRate_2d.points.push([
+    -rawData.rotationRate.alpha.int2,
     rawData.rotationRate.gamma.int2,
   ]);
 }
@@ -81,29 +102,6 @@ const valueTypes = [
   //'der2', 'der1',
   'raw', 'int1', 'int2'];
 
-const _createOrUpdateChartsForInputRec = (rawInput, timestamp, baseKey='') => {
-  if (typeof rawInput === 'number') return 0;
-  if (typeof rawInput !== 'object' || !rawInput) {
-    console.log('CRITICAL rawInput not obj/num', typeof rawInput, rawInput, baseKey);
-  }
-  let depth;
-  Object.entries(rawInput).forEach(([kEnd, rawData]) => {
-    const key = `${baseKey ? `${baseKey}_`:''}${kEnd}`;
-    depth = 1 + _createOrUpdateChartsForInputRec(rawData, timestamp, key);
-  });
-  if (depth !== 2) {
-    return depth;
-  }
-  valueTypes.forEach((type) => {
-    const title = `${baseKey ? `${baseKey}_`:''}${type}`;
-    if (window.chartsByTitle[title]) {
-      window.updateChart(baseKey, type, rawInput, timestamp)
-    } else {
-      window.createNewChart(baseKey, type, rawInput, timestamp)
-    }
-  })
-}
-
 let plotReady = false;
 window.reloadChart = () => {
   if (plotReady) {
@@ -122,6 +120,7 @@ const _initSocketIO = () => {
   const socket = io("http://192.168.0.21:8080");
   localStorage.debug = 'socket.io-client:socket';
   socket.on('data', window.handleNewData);
+  socket.on('reset', window.resetNextTraces);
   setTimeout(window.reloadChart, 100);
 }
 

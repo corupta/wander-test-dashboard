@@ -1,9 +1,12 @@
 #plots {
     width: 100%;
     display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
 }
 
 #plots > div {
     width: 33%;
-    height: 600px;
+    height: 480px;
+    border: 4px solid #888;
 }

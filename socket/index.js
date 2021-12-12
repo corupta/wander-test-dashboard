@@ -8,6 +8,10 @@ io.on("connection", (socket) => {
     console.log('ts', timestamp);
     socket.broadcast.emit("data", data, timestamp);
   });
+  socket.on("reset", () => {
+    console.log('reset');
+    socket.broadcast.emit("reset");
+  });
   socket.on('disconnect', () => {
     console.log('a socket disconnected');
   })
